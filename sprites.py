@@ -76,6 +76,7 @@ class Player(Sprite):
         now = pg.time.get_ticks()
         if now - self.last_update > 350:
             self.last_update = now
+            self.image.set_colorkey(BLACK)
             self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
             bottom = self.rect.bottom
             self.image = self.idle_frames[self.current_frame]
