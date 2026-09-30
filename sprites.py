@@ -40,6 +40,7 @@ class Player(Sprite):
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.load_images()
         self.image = pg.Surface((TILESIZE,TILESIZE))
         self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE)
         self.image.set_colorkey(BLACK)
@@ -47,6 +48,8 @@ class Player(Sprite):
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
+        self.last_update = 0
+        self.current_frame = 0
     def get_keys(self):
         # reset v to 0
         # get events based on keys
@@ -68,8 +71,23 @@ class Player(Sprite):
         
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
+    def animate(self):
+        # use the time element to get now
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+            bottom = self.rect.bottom
+            self.image = self.idle_frames[self.current_frame]
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
+                            ]
     def update(self):
         self.get_keys()
+        self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
