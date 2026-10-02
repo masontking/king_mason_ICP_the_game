@@ -42,9 +42,9 @@ class Player(Sprite):
         Sprite.__init__(self, self.groups) # initialize the sprite
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
-        self.load_images()
         self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE) # set sprite's image
         self.image.set_colorkey(BLACK)
+        self.load_images()
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT # initialize hit rect
         self.vel = vec(0,0)
@@ -77,11 +77,11 @@ class Player(Sprite):
         now = pg.time.get_ticks()
         if now - self.last_update > 350:
             self.last_update = now
-            self.image.set_colorkey(BLACK)
             self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
             bottom = self.rect.bottom
             self.image = self.idle_frames[self.current_frame]
             self.rect = self.image.get_rect()
+            self.image.set_colorkey(BLACK)
             self.rect.bottom = bottom
     def load_images(self): # load in the frames
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
@@ -139,8 +139,8 @@ class Mob(Sprite):
         self.groups = game.all_sprites, game.all_mobs
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE,TILESIZE))
-        self.image.fill(RED)
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
+        self.image = self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE,TILESIZE) # set sprite's image
         self.speed = 1
         self.rect = self.image.get_rect()
         self.vx, self.vy = 200,200
@@ -148,11 +148,29 @@ class Mob(Sprite):
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+        self.last_update = 0
+        self.current_frame = 0
+        self.load_images()
         print("initiated mob")
         print(self.rect.x)
         print(self.rect.y)
+    def animate(self):
+        # use the time element to get now
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
+            bottom = self.rect.bottom
+            self.image = self.idle_frames[self.current_frame]
+            self.image.set_colorkey(BLACK)
+            self.rect.bottom = bottom
+    def load_images(self): # load in the frames
+        self.idle_frames = [self.spritesheet.get_image(TILESIZE * 4,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE * 5,0,TILESIZE, TILESIZE)
+                            ]
     
     def update(self):
+        self.animate()
         self.x += self.vx * self.game.dt * self.speed
         self.rect.x = self.x
         self.y += self.vy * self.game.dt * self.speed
