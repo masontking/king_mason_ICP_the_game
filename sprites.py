@@ -104,17 +104,35 @@ class Wall(Sprite):
         self.groups = game.all_sprites, game.all_walls
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE,TILESIZE))
-        self.image.fill(GREEN)
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
+        self.image = self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE,TILESIZE) # set sprite's image
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+        self.last_update = 0
+        self.current_frame = 0
+        self.load_images()
         print("initiated wall")
         print(self.rect.x)
         print(self.rect.y)
+    def animate(self):
+        # use the time element to get now
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
+            bottom = self.rect.bottom
+            self.image = self.idle_frames[self.current_frame]
+            self.rect.bottom = bottom
+    def load_images(self): # load in the frames
+        self.idle_frames = [self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE * 3,0,TILESIZE, TILESIZE)
+                            ]
+    def update(self):
+        self.animate()
 
 class Mob(Sprite):
     def __init__(self, game, x, y):
