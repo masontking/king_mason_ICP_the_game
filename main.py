@@ -2,6 +2,7 @@
 # this file was created by MASON KING
 # code inspired by Chris Bradfield who was inspired by Notch
 
+# import everything needed to run the code
 import pygame as pg
 from os import path
 from settings import *
@@ -14,16 +15,16 @@ class Game:
         pg.mixer.init()   # initiate audio within pygame
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         print("initiated game")
-        pg.display.set_caption(TITLE)
+        pg.display.set_caption(TITLE) # sets the name of the window to TITLE
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
 
     def load_data(self, map):
-        self.game_dir = path.dirname(__file__)
-        self.img_dir = path.join(self.game_dir, 'images')
-        self.snd_dir = path.join(self.game_dir, 'audio')
-        self.map = Map(path.join(self.game_dir, map))
+        self.game_dir = path.dirname(__file__) # game directory 
+        self.img_dir = path.join(self.game_dir, 'images') # image directory
+        self.snd_dir = path.join(self.game_dir, 'audio') # audio directory
+        self.map = Map(path.join(self.game_dir, map)) # tilemap directory
 
     def new(self):
         self.load_data('level1.txt')
@@ -39,7 +40,7 @@ class Game:
             for col, tile in enumerate(tiles):
                 if tile == 'P':
                     Player(self, col, row)
-        
+    # if the game is running, do stuff
     def run(self):
         self.playing = True
         while self.playing:
@@ -47,22 +48,23 @@ class Game:
             self.events()
             self.update()
             self.draw()
-    
+    # checks if you've closed the window
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 if self.playing:
                     self.playing = False
                 self.running = False
-    
+    # just update the sprites, man
     def update(self):
         self.all_sprites.update()
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
-        self.all_sprites.draw(self.screen)
+        self.screen.fill(BGCOLOR) # change the color of the background
+        self.all_sprites.draw(self.screen) # fill the bg with the color of choosing
         pg.display.flip()
 
+# run the game :D
 if __name__ == "__main__":
     g = Game()
 while g.running:

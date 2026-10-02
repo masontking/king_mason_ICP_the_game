@@ -1,3 +1,5 @@
+
+# import everything needed
 import pygame as pg
 from pygame.sprite import Sprite
 from settings import *
@@ -8,7 +10,7 @@ from os import path
 vec = pg.math.Vector2
 
 def collide_hit_rect(one, two):
-    return one.hit_rect.colliderect(two.rect)
+    return one.hit_rect.colliderect(two.rect) # checks if colliderects are touching each other
 
 # if we collide with walls, this function runs.
 def collide_with_walls(sprite, group, dir):
@@ -37,15 +39,14 @@ def collide_with_walls(sprite, group, dir):
 class Player(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
-        Sprite.__init__(self, self.groups)
+        Sprite.__init__(self, self.groups) # initialize the sprite
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
         self.load_images()
-        self.image = pg.Surface((TILESIZE,TILESIZE))
-        self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE)
+        self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE) # set sprite's image
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect = PLAYER_HIT_RECT # initialize hit rect
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.last_update = 0
@@ -69,7 +70,7 @@ class Player(Sprite):
             self.vel.y = PLAYER_SPEED
             self.vy = PLAYER_SPEED
         
-        if self.vel.x != 0 and self.vel.y != 0:
+        if self.vel.x != 0 and self.vel.y != 0: # if going diagonal, make the speed slower
             self.vel *= 0.7071
     def animate(self):
         # use the time element to get now
@@ -77,12 +78,12 @@ class Player(Sprite):
         if now - self.last_update > 350:
             self.last_update = now
             self.image.set_colorkey(BLACK)
-            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
             bottom = self.rect.bottom
             self.image = self.idle_frames[self.current_frame]
             self.rect = self.image.get_rect()
             self.rect.bottom = bottom
-    def load_images(self):
+    def load_images(self): # load in the frames
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
                             ]

@@ -1,3 +1,4 @@
+# import what is needed
 import pygame as pg
 from settings import *
 from math import floor
