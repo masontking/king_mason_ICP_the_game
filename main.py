@@ -31,7 +31,6 @@ class Game:
         self.all_sprites = pg.sprite.Group() # creates a group where the sprites data will coincide
         self.all_walls = pg.sprite.Group() # creates a group where the wall sprites data will coincide
         self.all_mobs = pg.sprite.Group() # creates a group where the enemy sprites data will coincide
-        self.mob = Mob(self,5,5)
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -40,6 +39,8 @@ class Game:
             for col, tile in enumerate(tiles):
                 if tile == 'P':
                     Player(self, col, row)
+                if tile == 'E':
+                    Mob(self, col, row)
     # if the game is running, do stuff
     def run(self):
         self.playing = True
@@ -55,6 +56,13 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
+    def draw_text(self, text, size, color, x, y):
+        font_name = pg.font.match_font('arial')
+        font = pg.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (x,y)
+        self.screen.blit(text_surface, text_rect)
     # just update the sprites, man
     def update(self):
         self.all_sprites.update()
@@ -62,6 +70,8 @@ class Game:
     def draw(self):
         self.screen.fill(BGCOLOR) # change the color of the background
         self.all_sprites.draw(self.screen) # fill the bg with the color of choosing
+        self.draw_text("FPS: " + str(floor(1/self.dt)), 24, WHITE, WIDTH-50, 0)
+        self.draw_text("Enemy count: " + str(len(self.all_mobs)), 24, WHITE, WIDTH-80, 20)
         pg.display.flip()
 
 # run the game :D
