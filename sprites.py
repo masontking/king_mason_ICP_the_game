@@ -13,7 +13,7 @@ def collide_hit_rect(one, two):
     return one.hit_rect.colliderect(two.rect) # checks if colliderects are touching each other
 
 # if we collide with walls, this function runs.
-def collide_with_walls(sprite, group, dir):
+def collide_with_walls(sprite, group, dir, collidingObj):
     if dir == "x":
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
         if hits:
@@ -23,7 +23,10 @@ def collide_with_walls(sprite, group, dir):
             # checks for collision from the right
             if hits[0].rect.centerx < sprite.hit_rect.centerx:
                 sprite.pos.x = hits[0].rect.right + sprite.hit_rect.width / 2
-            sprite.vel.x = 0
+            if collidingObj == 'player':
+                sprite.vel.x = 0
+            elif collidingObj == 'mob':
+                sprite.vel.x *= -1
             sprite.hit_rect.centerx = sprite.pos.x
     if dir == "y":
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
@@ -34,7 +37,10 @@ def collide_with_walls(sprite, group, dir):
             # checks for collision from the bottom
             if hits[0].rect.centery < sprite.hit_rect.centery:
                 sprite.pos.y = hits[0].rect.bottom + sprite.hit_rect.height / 2
-            sprite.vel.y = 0
+            if collidingObj == 'player':
+                sprite.vel.y = 0
+            elif collidingObj == 'mob':
+                sprite.vel.y *= -1
             sprite.hit_rect.centery = sprite.pos.y
 class Player(Sprite):
     def __init__(self, game, x, y):
@@ -93,9 +99,9 @@ class Player(Sprite):
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls,'x')
+        collide_with_walls(self, self.game.all_walls,'x','player')
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls,'y')
+        collide_with_walls(self, self.game.all_walls,'y','player')
         self.rect.center = self.hit_rect.center
         
 
@@ -143,11 +149,11 @@ class Mob(Sprite):
         self.image = self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE,TILESIZE) # set sprite's image
         self.speed = 1
         self.rect = self.image.get_rect()
-        self.vx, self.vy = 200,200
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.hit_rect = PLAYER_HIT_RECT
+        self.vel = vec(1,1)
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
         self.last_update = 0
         self.current_frame = 0
         self.load_images()
@@ -171,11 +177,9 @@ class Mob(Sprite):
     
     def update(self):
         self.animate()
-        self.x += self.vx * self.game.dt * self.speed
-        self.rect.x = self.x
-        self.y += self.vy * self.game.dt * self.speed
-        self.rect.y = self.y
-        if self.x > WIDTH - TILESIZE or self.x < 0:
-            self.vx *= -1
-        if self.y > HEIGHT - TILESIZE or self.y < 0:
-            self.vy *= -1
+        self.pos += self.vel * self.game.dt * PLAYER_SPEED
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.all_walls,'x','mob')
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.all_walls,'y','mob')
+        self.rect.center = self.hit_rect.center
