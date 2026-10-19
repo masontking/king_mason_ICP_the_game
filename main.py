@@ -31,6 +31,7 @@ class Game:
         self.all_sprites = pg.sprite.Group() # creates a group where the sprites data will coincide
         self.all_walls = pg.sprite.Group() # creates a group where the wall sprites data will coincide
         self.all_mobs = pg.sprite.Group() # creates a group where the enemy sprites data will coincide
+        self.all_coins = pg.sprite.Group() # creates a group where the coin sprites data will coincide
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -38,9 +39,11 @@ class Game:
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == 'P':
-                    Player(self, col, row)
+                    self.player = Player(self, col, row)
                 if tile == 'E':
                     Mob(self, col, row)
+                if tile == 'C':
+                    Coin(self, col, row)
     # if the game is running, do stuff
     def run(self):
         self.playing = True
@@ -72,6 +75,7 @@ class Game:
         self.all_sprites.draw(self.screen) # fill the bg with the color of choosing
         self.draw_text("FPS: " + str(floor(1/self.dt)), 24, WHITE, WIDTH-50, 0)
         self.draw_text("Enemy count: " + str(len(self.all_mobs)), 24, WHITE, WIDTH-80, 20)
+        self.draw_text("Coins: " + str(self.player.coins), 24, WHITE, WIDTH-50, 40)
         pg.display.flip()
 
 # run the game :D

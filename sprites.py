@@ -54,6 +54,7 @@ class Player(Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT # initialize hit rect
         self.vel = vec(0,0)
+        self.coins = 0
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.last_update = 0
         self.current_frame = 0
@@ -95,6 +96,9 @@ class Player(Sprite):
                             ]
     def update(self):
         self.get_keys()
+        hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
+        if hits:
+            self.coins += 1
         self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -111,7 +115,7 @@ class Wall(Sprite):
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
-        self.image = self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE,TILESIZE) # set sprite's image
+        self.image = self.spritesheet.get_image(0,TILESIZE,TILESIZE,TILESIZE) # set sprite's image
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
@@ -134,8 +138,8 @@ class Wall(Sprite):
             self.image = self.idle_frames[self.current_frame]
             self.rect.bottom = bottom
     def load_images(self): # load in the frames
-        self.idle_frames = [self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE * 3,0,TILESIZE, TILESIZE)
+        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
                             ]
     def update(self):
         self.animate()
@@ -146,14 +150,13 @@ class Mob(Sprite):
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
-        self.image = self.spritesheet.get_image(TILESIZE * 2,0,TILESIZE,TILESIZE) # set sprite's image
+        self.image = self.spritesheet.get_image(0,TILESIZE*2,TILESIZE,TILESIZE) # set sprite's image
         self.speed = 1
         self.rect = self.image.get_rect()
-        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect = MOB_HIT_RECT
         self.vel = vec(1,1)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
-        self.rect.x = self.pos.x
-        self.rect.y = self.pos.y
+        self.rect = self.image.get_rect()
         self.last_update = 0
         self.current_frame = 0
         self.load_images()
@@ -171,8 +174,8 @@ class Mob(Sprite):
             self.image.set_colorkey(BLACK)
             self.rect.bottom = bottom
     def load_images(self): # load in the frames
-        self.idle_frames = [self.spritesheet.get_image(TILESIZE * 4,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE * 5,0,TILESIZE, TILESIZE)
+        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE, TILESIZE)
                             ]
     
     def update(self):
@@ -183,3 +186,37 @@ class Mob(Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls,'y','mob')
         self.rect.center = self.hit_rect.center
+class Coin(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_coins
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
+        self.image = self.spritesheet.get_image(0,TILESIZE*3,TILESIZE,TILESIZE) # set sprite's image
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.last_update = 0
+        self.current_frame = 0
+        self.load_images()
+    def animate(self):
+        # use the time element to get now
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
+            bottom = self.rect.bottom
+            self.image = self.idle_frames[self.current_frame]
+            self.image.set_colorkey(BLACK)
+            self.rect.bottom = bottom
+    def load_images(self): # load in the frames
+        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*3,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,TILESIZE*3,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*2,TILESIZE*3,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*3,TILESIZE*3,TILESIZE, TILESIZE)
+                            ]
+    def update(self):
+        self.animate()
