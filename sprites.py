@@ -27,6 +27,7 @@ def collide_with_walls(sprite, group, dir, collidingObj):
                 sprite.vel.x = 0
             elif collidingObj == 'mob':
                 sprite.vel.x *= -1
+                print('y collide')
             sprite.hit_rect.centerx = sprite.pos.x
     if dir == "y":
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
@@ -41,6 +42,7 @@ def collide_with_walls(sprite, group, dir, collidingObj):
                 sprite.vel.y = 0
             elif collidingObj == 'mob':
                 sprite.vel.y *= -1
+                print('x collide')
             sprite.hit_rect.centery = sprite.pos.y
 class Player(Sprite):
     def __init__(self, game, x, y):
@@ -99,6 +101,7 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
             self.coins += 1
+            self.game.coin_snd.play()
         self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -156,7 +159,6 @@ class Mob(Sprite):
         self.hit_rect = MOB_HIT_RECT
         self.vel = vec(1,1)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
-        self.rect = self.image.get_rect()
         self.last_update = 0
         self.current_frame = 0
         self.load_images()

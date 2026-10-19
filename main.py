@@ -23,7 +23,9 @@ class Game:
     def load_data(self, map):
         self.game_dir = path.dirname(__file__) # game directory 
         self.img_dir = path.join(self.game_dir, 'images') # image directory
+        # for sound handling
         self.snd_dir = path.join(self.game_dir, 'audio') # audio directory
+        self.coin_snd = pg.mixer.Sound(path.join(self.snd_dir, "coin.wav"))
         self.map = Map(path.join(self.game_dir, map)) # tilemap directory
 
     def new(self):
