@@ -46,6 +46,8 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'C':
                     Coin(self, col, row)
+        pg.mixer.music.load(path.join(self.snd_dir, "bgmusic.mp3"))
+        pg.mixer.music.play(loops=-1)
     # if the game is running, do stuff
     def run(self):
         self.playing = True
