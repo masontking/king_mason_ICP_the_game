@@ -19,14 +19,29 @@ class Game:
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
+        self.level = 1
+        self.score = 0
 
     def load_data(self, map):
         self.game_dir = path.dirname(__file__) # game directory 
+        self.game_save_file = path.join(self.game_dir, "levelnum.txt")
         self.img_dir = path.join(self.game_dir, 'images') # image directory
         # for sound handling
         self.snd_dir = path.join(self.game_dir, 'audio') # audio directory
         self.coin_snd = pg.mixer.Sound(path.join(self.snd_dir, "coin.wav"))
         self.map = Map(path.join(self.game_dir, map)) # tilemap directory
+        try:
+            with open(self.game_save_file, "x", encoding="utf-8") as c:
+                c.write("hell yeah")
+            print("file created")
+        except FileExistsError:
+            pass
+        with open(self.game_save_file, "r") as c:
+            try:
+                self.level = int(c.read())
+            except:
+                print('idkl')
+            
 
     def new(self):
         self.load_data('level1.txt')
@@ -56,13 +71,17 @@ class Game:
             self.events()
             self.update()
             self.draw()
-    # checks if you've closed the window
     def events(self):
         for event in pg.event.get():
+            # checks if you've closed the window or the game has quit
             if event.type == pg.QUIT:
+                with open(path.join(self.game_dir, self.game_save_file), "w") as c:
+                    c.write(str(self.score))
                 if self.playing:
                     self.playing = False
                 self.running = False
+                # checking for exceptions to know whether or not the save file code is working
+                    
     def draw_text(self, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)
