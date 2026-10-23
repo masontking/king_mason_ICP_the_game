@@ -5,6 +5,7 @@ from pygame.sprite import Sprite
 from settings import *
 from utils import *
 
+from random import randint
 from os import path
 
 vec = pg.math.Vector2
@@ -100,6 +101,8 @@ class Player(Sprite):
         self.get_keys()
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
+            for i in range(10):
+                Particle(self.game, hits[0].pos.x, hits[0].pos.y)
             self.coins += 1
             self.game.coin_snd.play()
             self.game.score += 1
@@ -147,6 +150,31 @@ class Wall(Sprite):
                             ]
     def update(self):
         self.animate()
+
+class Particle(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_particles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/8,TILESIZE/8))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x
+        self.y = y
+        self.countdown = Cooldown(500)
+        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
+        self.speedX = 2 * (randint(-20, 20)/10)
+        self.speedY = 2 * (randint(-20, 20)/10)
+        self.rect.x = self.x
+        self.rect.y = self.y
+    def update(self):
+        self.countdown.ticking()
+        self.rect.x += self.speedX
+        self.rect.y += self.speedY
+        if self.countdown.delta > 3:
+            self.kill()
+
 
 class Mob(Sprite):
     def __init__(self, game, x, y):
@@ -200,8 +228,7 @@ class Coin(Sprite):
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.last_update = 0
         self.current_frame = 0
         self.load_images()
@@ -223,3 +250,5 @@ class Coin(Sprite):
                             ]
     def update(self):
         self.animate()
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y

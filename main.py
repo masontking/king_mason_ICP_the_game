@@ -49,6 +49,7 @@ class Game:
         self.all_walls = pg.sprite.Group() # creates a group where the wall sprites data will coincide
         self.all_mobs = pg.sprite.Group() # creates a group where the enemy sprites data will coincide
         self.all_coins = pg.sprite.Group() # creates a group where the coin sprites data will coincide
+        self.all_particles = pg.sprite.Group() # creates a group where particles data will coincide
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -76,7 +77,7 @@ class Game:
             # checks if you've closed the window or the game has quit
             if event.type == pg.QUIT:
                 with open(path.join(self.game_dir, self.game_save_file), "w") as c:
-                    c.write(str(self.score))
+                    c.write(str(self.level))
                 if self.playing:
                     self.playing = False
                 self.running = False
