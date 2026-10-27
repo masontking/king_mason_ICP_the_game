@@ -56,12 +56,14 @@ class Game:
                     Wall(self, col, row)
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
-                if tile == 'P':
-                    self.player = Player(self, col, row)
-                if tile == 'E':
-                    Mob(self, col, row)
                 if tile == 'C':
                     Coin(self, col, row)
+                if tile == 'E':
+                    self.mob = Mob(self, col, row)
+        for row, tiles in enumerate(self.map.data):
+            for col, tile in enumerate(tiles):
+                if tile == 'P':
+                    self.player = Player(self, col, row)
         pg.mixer.music.load(path.join(self.snd_dir, "bgmusic.mp3"))
         pg.mixer.music.play(loops=-1)
     # if the game is running, do stuff

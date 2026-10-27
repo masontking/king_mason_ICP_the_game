@@ -101,7 +101,7 @@ class Player(Sprite):
         self.get_keys()
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
-            for i in range(10):
+            for i in range(20):
                 Particle(self.game, hits[0].pos.x, hits[0].pos.y)
             self.coins += 1
             self.game.coin_snd.play()
@@ -162,7 +162,7 @@ class Particle(Sprite):
         self.vx, self.vy = 0,0
         self.x = x
         self.y = y
-        self.countdown = Cooldown(500)
+        self.countdown = Cooldown()
         self.countdown.event_time = floor(pg.time.get_ticks()/1000)
         self.speedX = 2 * (randint(-20, 20)/10)
         self.speedY = 2 * (randint(-20, 20)/10)
@@ -172,7 +172,7 @@ class Particle(Sprite):
         self.countdown.ticking()
         self.rect.x += self.speedX
         self.rect.y += self.speedY
-        if self.countdown.delta > 3:
+        if self.countdown.delta > 1:
             self.kill()
 
 
