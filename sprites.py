@@ -57,31 +57,28 @@ class Player(Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT # initialize hit rect
         self.vel = vec(0,0)
+        self.acc = vec(0,0)
         self.coins = 0
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.last_update = 0
         self.current_frame = 0
     def get_keys(self):
-        # reset v to 0
         # get events based on keys
-        # change vel baesd on keys
-        self.vel = vec(0,0)
+        # change acceleration baesd on keys
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]: # if a or left arrow is pressed, the player moves left.
-            self.vel.x = -PLAYER_SPEED
-            self.vx = -PLAYER_SPEED
+            self.acc.x = -PLAYER_SPEED
+            # self.vel.x = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]: # if d or right arrow is pressed, the player moves right.
-            self.vel.x = PLAYER_SPEED
-            self.vx = PLAYER_SPEED
+            self.acc.x = PLAYER_SPEED
+            # self.vel.x = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]: # if w or up arrow is pressed, the player moves up.
-            self.vel.y = -PLAYER_SPEED
-            self.vy = -PLAYER_SPEED
+            self.acc.y = -PLAYER_SPEED
+            # self.vel.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]: # if s or down arrow is pressed, the player moves down.
-            self.vel.y = PLAYER_SPEED
-            self.vy = PLAYER_SPEED
+            self.acc.y = PLAYER_SPEED
+            # self.vel.y = PLAYER_SPEED
         
-        if self.vel.x != 0 and self.vel.y != 0: # if going diagonal, make the speed slower
-            self.vel *= 0.7071
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
@@ -98,17 +95,21 @@ class Player(Sprite):
                             self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
                             ]
     def update(self):
+        self.acc = vec(0,0)
         self.get_keys()
+        self.acc.x += self.vel.x * PLAYER_FRIC
+        self.acc.y += self.vel.y * PLAYER_FRIC
+        self.vel += self.acc
+        self.rect.center = self.pos
+        self.pos += self.vel + 0.5 * self.acc   
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
-            for i in range(20):
+            for i in range(10):
                 Particle(self.game, hits[0].pos.x, hits[0].pos.y)
             self.coins += 1
             self.game.coin_snd.play()
             self.game.score += 1
-        self.animate()
-        self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        self.animate()    
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls,'x','player')
         self.hit_rect.centery = self.pos.y
@@ -211,7 +212,7 @@ class Mob(Sprite):
     
     def update(self):
         self.animate()
-        self.pos += self.vel * self.game.dt * PLAYER_SPEED
+        self.pos += self.vel * self.game.dt * MOB_SPEED
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls,'x','mob')
         self.hit_rect.centery = self.pos.y
