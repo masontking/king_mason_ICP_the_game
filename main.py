@@ -40,7 +40,7 @@ class Game:
             try:
                 self.level = int(c.read())
             except:
-                print('idkl')
+                pass
             
 
     def new(self):
