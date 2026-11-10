@@ -44,7 +44,7 @@ class Game:
             
 
     def new(self):
-        self.load_data('level1.txt')
+        self.load_data('level2.txt')
         self.all_sprites = pg.sprite.Group() # creates a group where the sprites data will coincide
         self.all_walls = pg.sprite.Group() # creates a group where the wall sprites data will coincide
         self.all_mobs = pg.sprite.Group() # creates a group where the enemy sprites data will coincide

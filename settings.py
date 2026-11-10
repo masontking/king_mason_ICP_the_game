@@ -8,12 +8,13 @@ TILESIZE = 32
 FPS = 30
 
 # colors
-BGCOLOR = (255,0,255)
+BGCOLOR = (0,220,0)
 WHITE = (255,255,255)
 GREEN = (0,128,0)
 RED = (255,0,0)
 BLACK = (0,0,0)
 YELLOW = (255,255,0)
+GRAY = (128,128,128)
 
 # player settings
 PLAYER_SPEED = 1

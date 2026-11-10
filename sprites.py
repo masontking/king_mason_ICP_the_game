@@ -50,9 +50,9 @@ class Player(Sprite):
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups) # initialize the sprite
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet_brit.png")) # get the image from the spritesheet
         self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE) # set sprite's image
-        self.image.set_colorkey(BLACK)
+        self.image.set_colorkey(GRAY)
         self.load_images()
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT # initialize hit rect
@@ -88,11 +88,13 @@ class Player(Sprite):
             bottom = self.rect.bottom
             self.image = self.idle_frames[self.current_frame]
             self.rect = self.image.get_rect()
-            self.image.set_colorkey(BLACK)
+            self.image.set_colorkey(GRAY)
             self.rect.bottom = bottom
     def load_images(self): # load in the frames
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
+                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE)
                             ]
     def update(self):
         self.acc = vec(0,0)
@@ -122,7 +124,7 @@ class Wall(Sprite):
         self.groups = game.all_sprites, game.all_walls
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # get the image from the spritesheet
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet_brit.png")) # get the image from the spritesheet
         self.image = self.spritesheet.get_image(0,TILESIZE,TILESIZE,TILESIZE) # set sprite's image
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0,0
@@ -147,7 +149,6 @@ class Wall(Sprite):
             self.rect.bottom = bottom
     def load_images(self): # load in the frames
         self.idle_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)
                             ]
     def update(self):
         self.animate()
