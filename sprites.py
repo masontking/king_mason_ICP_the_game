@@ -67,16 +67,16 @@ class Player(Sprite):
         # change acceleration baesd on keys
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]: # if a or left arrow is pressed, the player moves left.
-            self.acc.x = -PLAYER_SPEED
+            self.vel.x = -PLAYER_SPEED
             # self.vel.x = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]: # if d or right arrow is pressed, the player moves right.
-            self.acc.x = PLAYER_SPEED
+            self.vel.x = PLAYER_SPEED
             # self.vel.x = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]: # if w or up arrow is pressed, the player moves up.
-            self.acc.y = -PLAYER_SPEED
+            self.vel.y = -PLAYER_SPEED
             # self.vel.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]: # if s or down arrow is pressed, the player moves down.
-            self.acc.y = PLAYER_SPEED
+            self.vel.y = PLAYER_SPEED
             # self.vel.y = PLAYER_SPEED
         
     def animate(self):
@@ -84,26 +84,29 @@ class Player(Sprite):
         now = pg.time.get_ticks()
         if now - self.last_update > 350:
             self.last_update = now
-            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
             bottom = self.rect.bottom
-            self.image = self.idle_frames[self.current_frame]
+            if self.vel.x != 0 or self.vel.y != 0:
+                self.current_frame = (self.current_frame + 1) % len(self.walking_frames) # go to the next frame
+                self.image = self.walking_frames[self.current_frame]
+                if self.vel.x > 0:
+                    self.image = pg.transform.rotate(self.image, 270)
+            else:
+                self.image = self.idle_frame
             self.rect = self.image.get_rect()
             self.image.set_colorkey(GRAY)
             self.rect.bottom = bottom
     def load_images(self): # load in the frames
-        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE)
-                            ]
+        self.idle_frame = self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
+        self.walking_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
+                               self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
+                               self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
+                               self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE)
+                               ]
     def update(self):
-        self.acc = vec(0,0)
+        self.vel = vec(0,0)
         self.get_keys()
-        self.acc.x += self.vel.x * PLAYER_FRIC
-        self.acc.y += self.vel.y * PLAYER_FRIC
-        self.vel += self.acc
         self.rect.center = self.pos
-        self.pos += self.vel + 0.5 * self.acc   
+        self.pos += self.vel * self.game.dt
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
             for i in range(10):
