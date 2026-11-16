@@ -69,20 +69,20 @@ class Player(Sprite):
         if keys[pg.K_LEFT] or keys[pg.K_a]: # if a or left arrow is pressed, the player moves left.
             self.vel.x = -PLAYER_SPEED
             # self.vel.x = -PLAYER_SPEED
-        if keys[pg.K_RIGHT] or keys[pg.K_d]: # if d or right arrow is pressed, the player moves right.
+        elif keys[pg.K_RIGHT] or keys[pg.K_d]: # if d or right arrow is pressed, the player moves right.
             self.vel.x = PLAYER_SPEED
             # self.vel.x = PLAYER_SPEED
-        if keys[pg.K_UP] or keys[pg.K_w]: # if w or up arrow is pressed, the player moves up.
+        elif keys[pg.K_UP] or keys[pg.K_w]: # if w or up arrow is pressed, the player moves up.
             self.vel.y = -PLAYER_SPEED
             # self.vel.y = -PLAYER_SPEED
-        if keys[pg.K_DOWN] or keys[pg.K_s]: # if s or down arrow is pressed, the player moves down.
+        elif keys[pg.K_DOWN] or keys[pg.K_s]: # if s or down arrow is pressed, the player moves down.
             self.vel.y = PLAYER_SPEED
             # self.vel.y = PLAYER_SPEED
         
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
-        if now - self.last_update > 350:
+        if now - self.last_update > 200:
             self.last_update = now
             bottom = self.rect.bottom
             if self.vel.x != 0 or self.vel.y != 0:
@@ -90,6 +90,10 @@ class Player(Sprite):
                 self.image = self.walking_frames[self.current_frame]
                 if self.vel.x > 0:
                     self.image = pg.transform.rotate(self.image, 270)
+                if self.vel.x < 0:
+                    self.image = pg.transform.rotate(self.image, 90)
+                if self.vel.y > 0:
+                    self.image = pg.transform.rotate(self.image, 180)
             else:
                 self.image = self.idle_frame
             self.rect = self.image.get_rect()
@@ -123,38 +127,29 @@ class Player(Sprite):
         
 
 class Wall(Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, color, image):
         self.groups = game.all_sprites, game.all_walls
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet_brit.png")) # get the image from the spritesheet
-        self.image = self.spritesheet.get_image(0,TILESIZE,TILESIZE,TILESIZE) # set sprite's image
+        if color:
+            self.image = pg.Surface((TILESIZE,TILESIZE))
+            self.image.fill(color)
+        if image:
+            if image == 'house':
+                self.image = self.spritesheet.get_image(0,TILESIZE,TILESIZE,TILESIZE)
+                self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
-        self.last_update = 0
-        self.current_frame = 0
-        self.load_images()
+        # self.last_update = 0
+        # self.current_frame = 0
         print("initiated wall")
         print(self.rect.x)
         print(self.rect.y)
-    def animate(self):
-        # use the time element to get now
-        now = pg.time.get_ticks()
-        if now - self.last_update > 350:
-            self.last_update = now
-            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) # go to the next frame
-            bottom = self.rect.bottom
-            self.image = self.idle_frames[self.current_frame]
-            self.rect.bottom = bottom
-    def load_images(self): # load in the frames
-        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
-                            ]
-    def update(self):
-        self.animate()
 
 class Particle(Sprite):
     def __init__(self, game, x, y):
@@ -257,3 +252,18 @@ class Coin(Sprite):
         self.animate()
         self.rect.x = self.pos.x
         self.rect.y = self.pos.y
+
+
+class BGSprite(Sprite): # this is for sprites that don't have a function. They are just there for asthetics.
+    def __init__(self, game, x, y, color, image):
+        self.groups = game.all_sprites
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        if color:
+            self.image = pg.Surface((TILESIZE,TILESIZE))
+            self.image.fill(color)
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y

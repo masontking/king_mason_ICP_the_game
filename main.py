@@ -44,7 +44,7 @@ class Game:
             
 
     def new(self):
-        self.load_data('level2.txt')
+        self.load_data('map.txt')
         self.all_sprites = pg.sprite.Group() # creates a group where the sprites data will coincide
         self.all_walls = pg.sprite.Group() # creates a group where the wall sprites data will coincide
         self.all_mobs = pg.sprite.Group() # creates a group where the enemy sprites data will coincide
@@ -53,7 +53,11 @@ class Game:
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
-                    Wall(self, col, row)
+                    Wall(self, col, row, BGCOLOR, False)
+                if tile == '2':
+                    Wall(self, col, row, False, 'house')
+                if tile == 'p':
+                    BGSprite(self, col, row, PATHCOLOR, False)
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == 'C':
