@@ -49,13 +49,16 @@ class Game:
         self.all_walls = pg.sprite.Group() # creates a group where the wall sprites data will coincide
         self.all_mobs = pg.sprite.Group() # creates a group where the enemy sprites data will coincide
         self.all_coins = pg.sprite.Group() # creates a group where the coin sprites data will coincide
-        self.all_particles = pg.sprite.Group() # creates a group where particles data will coincide
+        self.all_particles = pg.sprite.Group() # creates a group where particle data will coincide
+        self.all_buildings = pg.sprite.Group() # creates a group where building data will coincide
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Wall(self, col, row, BGCOLOR, False)
                 if tile == '2':
                     Wall(self, col, row, False, 'house')
+                if tile == '3':
+                    Building(self, col, row, False, 'barracks')
                 if tile == 'p':
                     BGSprite(self, col, row, PATHCOLOR, False)
         for row, tiles in enumerate(self.map.data):
@@ -104,8 +107,6 @@ class Game:
         self.screen.fill(BGCOLOR) # change the color of the background
         self.all_sprites.draw(self.screen) # fill the bg with the color of choosing
         self.draw_text("FPS: " + str(floor(1/self.dt)), 24, WHITE, WIDTH-50, 0)
-        self.draw_text("Enemy count: " + str(len(self.all_mobs)), 24, WHITE, WIDTH-80, 20)
-        self.draw_text("Coins: " + str(self.player.coins), 24, WHITE, WIDTH-50, 40)
         pg.display.flip()
 
 # run the game :D

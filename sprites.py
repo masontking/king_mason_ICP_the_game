@@ -267,3 +267,22 @@ class BGSprite(Sprite): # this is for sprites that don't have a function. They a
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+class Building(Sprite):
+    def __init__(self, game, x, y, color, image):
+        self.groups = game.all_sprites, game.all_buildings
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet_brit.png")) # get the image from the spritesheet
+        if color:
+            self.image = pg.Surface((TILESIZE*2,TILESIZE*2))
+            self.image.fill(color)
+        if image:
+            if image == 'barracks':
+                self.image = self.spritesheet.get_image(TILESIZE*2,TILESIZE,TILESIZE*2,TILESIZE*2)
+                self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = (x*TILESIZE)
+        self.y = (y*TILESIZE)
+        self.rect.x = self.x
+        self.rect.y = self.y
