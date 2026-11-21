@@ -45,6 +45,18 @@ def collide_with_walls(sprite, group, dir, collidingObj):
                 sprite.vel.y *= -1
                 print('x collide')
             sprite.hit_rect.centery = sprite.pos.y
+# checks if you've clicked on an object, returns true if so. Credit to the pygame documentation fot the pg.mouse.get_pos(), it helped a lot developing this function!
+def clicked_on_sprite(x, y, w, h):
+    if pg.mouse.get_pressed()[0] and x < pg.mouse.get_pos()[0] and x + w > pg.mouse.get_pos()[0] and y < pg.mouse.get_pos()[1] and y + h > pg.mouse.get_pos()[1]:
+        return True
+    else:
+        return False
+
+# deletes all of the sprites in a group
+def kill_all(group):
+    for i in group.sprites(): # pygame documentation also helped with this
+        i.kill()
+
 class Player(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
@@ -62,6 +74,7 @@ class Player(Sprite):
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.last_update = 0
         self.current_frame = 0
+        self.building_collided = False
     def get_keys(self):
         # get events based on keys
         # change acceleration baesd on keys
@@ -118,13 +131,46 @@ class Player(Sprite):
             self.coins += 1
             self.game.coin_snd.play()
             self.game.score += 1
+        if pg.sprite.spritecollide(self, self.game.all_buildings, False):
+            if self.building_collided:
+                self.building_collided = False
+                print('collided w building')
+                for i in range(2):
+                    Barracks_Menu(self.game, i)
+        else:
+            self.building_collided = True
         self.animate()    
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls,'x','player')
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls,'y','player')
         self.rect.center = self.hit_rect.center
-        
+class Barracks_Menu(Sprite):
+    def __init__(self, game, part):
+        self.groups = game.all_sprites, game.all_barracksmenu
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.part = part
+        if part == 0:
+            self.image = pg.Surface((WIDTH - 160, HEIGHT - 160))
+            self.image.fill(BLACK)
+            self.rect = self.image.get_rect()
+            self.rect.x = 80
+            self.rect.y = 80
+        if part == 1:
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(RED)
+            self.rect = self.image.get_rect()
+            self.rect.x = WIDTH - (80+TILESIZE)
+            self.rect.y = 80
+            self.pos = (self.rect.x, self.rect.y)
+    def update(self):
+        if self.part == 0:
+            self.game.text_queue += [["BARRACKS", 50, WHITE, 210, 90]]
+            self.game.text_queue += [["Units:", 30, WHITE, 130, 140]]
+        if self.part == 1:
+            if clicked_on_sprite(self.pos[0], self.pos[1], TILESIZE,TILESIZE):
+                kill_all(self.game.all_barracksmenu)
 
 class Wall(Sprite):
     def __init__(self, game, x, y, color, image):
@@ -268,18 +314,14 @@ class BGSprite(Sprite): # this is for sprites that don't have a function. They a
         self.rect.x = self.x
         self.rect.y = self.y
 class Building(Sprite):
-    def __init__(self, game, x, y, color, image):
+    def __init__(self, game, x, y, image):
         self.groups = game.all_sprites, game.all_buildings
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet_brit.png")) # get the image from the spritesheet
-        if color:
-            self.image = pg.Surface((TILESIZE*2,TILESIZE*2))
-            self.image.fill(color)
-        if image:
-            if image == 'barracks':
-                self.image = self.spritesheet.get_image(TILESIZE*2,TILESIZE,TILESIZE*2,TILESIZE*2)
-                self.image.set_colorkey(BLACK)
+        if image == 'barracks':
+            self.image = self.spritesheet.get_image(TILESIZE*2,TILESIZE,TILESIZE*2,TILESIZE*2)
+            self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0,0
         self.x = (x*TILESIZE)

@@ -19,8 +19,8 @@ class Game:
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
-        self.level = 1
-        self.score = 0
+        self.text_queue = []
+        self.units = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
     def load_data(self, map):
         self.game_dir = path.dirname(__file__) # game directory 
@@ -51,6 +51,7 @@ class Game:
         self.all_coins = pg.sprite.Group() # creates a group where the coin sprites data will coincide
         self.all_particles = pg.sprite.Group() # creates a group where particle data will coincide
         self.all_buildings = pg.sprite.Group() # creates a group where building data will coincide
+        self.all_barracksmenu = pg.sprite.Group() # you get the idea at this point.
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -58,7 +59,7 @@ class Game:
                 if tile == '2':
                     Wall(self, col, row, False, 'house')
                 if tile == '3':
-                    Building(self, col, row, False, 'barracks')
+                    Building(self, col, row, 'barracks')
                 if tile == 'p':
                     BGSprite(self, col, row, PATHCOLOR, False)
         for row, tiles in enumerate(self.map.data):
@@ -91,7 +92,18 @@ class Game:
                     self.playing = False
                 self.running = False
                 # checking for exceptions to know whether or not the save file code is working
-                    
+
+
+    def draw(self):
+        self.screen.fill(BGCOLOR) # change the color of the background
+        self.all_sprites.draw(self.screen) # puts the sprites on the screen
+        self.draw_text("FPS: " + str(floor(1/self.dt)), 24, WHITE, WIDTH-50, 0)
+        for i in self.text_queue: # goes through a text queue created by the sprites
+            self.draw_text(i[0], i[1], i[2], i[3], i[4])
+        self.text_queue = []
+        pg.display.flip()
+    
+    # draws text (pretty self explanitory)      
     def draw_text(self, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)
@@ -99,15 +111,10 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x,y)
         self.screen.blit(text_surface, text_rect)
+    
     # just update the sprites, man
     def update(self):
         self.all_sprites.update()
-
-    def draw(self):
-        self.screen.fill(BGCOLOR) # change the color of the background
-        self.all_sprites.draw(self.screen) # fill the bg with the color of choosing
-        self.draw_text("FPS: " + str(floor(1/self.dt)), 24, WHITE, WIDTH-50, 0)
-        pg.display.flip()
 
 # run the game :D
 if __name__ == "__main__":
